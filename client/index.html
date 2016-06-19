@@ -1,0 +1,61 @@
+<html>
+<head>
+	<title>Maze Engine</title>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.2.3/ace.js"></script>
+	<script type="text/javascript" src="app/main.js"></script>
+	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+	<style type="text/css">
+		div.controls{
+			border: 1px solid gray;
+			width: 100%;
+		 	height:6%;
+	        position: absolute;
+	        top: 0;
+	        right: 0;
+	        bottom: 0;
+	        left: 0;
+		}
+		canvas.main-canvas{
+			border: 1px solid gray;
+			width: 50%;
+		 	height:90%;
+	        position: absolute;
+	        top: 6%;
+	        right: 0;
+	        bottom: 0;
+	        left: 50%;
+		}
+		 #editor { 
+		 	width: 50%;
+		 	height:90%;
+	        position: absolute;
+	        top: 6%;
+	        right: 0;
+	        bottom: 0;
+	        left: 0;
+	    }
+	</style>
+</head>
+<body>
+	<div class="controls">
+		<input type="button" class="btn btn-default" id="input-draw-solution" value="Draw solution">
+		<input type="button" class="btn btn-default" id="input-new-maze" value="New maze">
+	</div>
+	<div id="editor">(function(){
+    var getSolutionPath = function (startX, startY, endX, endY){
+    	return [
+    	    this.cells[0][0],
+    	    this.cells[1][0],
+    	    this.cells[2][0],
+    	    this.cells[3][0],
+    	    this.cells[4][0],
+    	    this.cells[5][0],
+    	    this.cells[6][0],
+    	    this.cells[7][0]
+        ];
+    } 
+    return getSolutionPath;
+}());</div>
+	<canvas class="main-canvas" width="0" height="0"></canvas>
+</body>
+</html>
