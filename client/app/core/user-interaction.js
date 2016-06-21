@@ -18,6 +18,7 @@ module.exports = (function(){
 			this.y = 0;
 		},
 		isComplete : function(){
+			console.log("Is Complete " + this.cell.x + " " + this.cell.y);
 			return this.cell.x === this.cells.length - 1 && this.cell.y === this.cells[0].length - 1;
 		},
 		moveTo : function(direction){
