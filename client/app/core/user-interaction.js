@@ -18,7 +18,7 @@ module.exports = (function(){
 			this.y = 0;
 		},
 		isComplete : function(){
-			return this.cell.x === this.cells.length && this.cell.y === this.cells[0].length;
+			return this.cell.x === this.cells.length - 1 && this.cell.y === this.cells[0].length - 1;
 		},
 		moveTo : function(direction){
 			if(!this.canMoveTo(direction)){
