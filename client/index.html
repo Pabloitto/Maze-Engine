@@ -38,23 +38,35 @@
 </head>
 <body>
 	<div class="controls">
-		<input type="button" class="btn btn-default" id="input-draw-solution" value="Draw solution">
+		<input type="button" class="btn btn-default" id="input-draw-solution" value="Run">
 		<input type="button" class="btn btn-default" id="input-new-maze" value="New maze">
 	</div>
 	<div id="editor">(function(){
-    var getSolutionPath = function (startX, startY, endX, endY){
-    	return [
-    	    this.cells[0][0],
-    	    this.cells[1][0],
-    	    this.cells[2][0],
-    	    this.cells[3][0],
-    	    this.cells[4][0],
-    	    this.cells[5][0],
-    	    this.cells[6][0],
-    	    this.cells[7][0]
-        ];
+    var run = function (){
+        while(this.canMoveTo('bottom')){
+            this.moveTo('bottom');
+        }
+        while(this.canMoveTo('rigth')){
+            this.moveTo('rigth');
+        }
+        while(this.canMoveTo('top')){
+            this.moveTo('top');
+        }
+        while(this.canMoveTo('left')){
+            this.moveTo('left');
+        }
+        while(this.canMoveTo('top')){
+            this.moveTo('top');
+        }
+        while(this.canMoveTo('rigth')){
+            this.moveTo('rigth');
+        }
+        while(this.canMoveTo('bottom')){
+            this.moveTo('bottom');
+        }
+        this.moveTo('rigth');
     } 
-    return getSolutionPath;
+    return run;
 }());</div>
 	<canvas class="main-canvas" width="0" height="0"></canvas>
 </body>

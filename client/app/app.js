@@ -4,7 +4,9 @@
 
 	var main = null,
 		Maze = require("../app/core/maze"),
-		Config = require("../app/core/config-maze");
+		Config = require("../app/core/config-maze"),
+		UserInteraction = require("../app/core/user-interaction"),
+		interaction = null;
 
 	function Main(){}
 
@@ -34,6 +36,9 @@
 				this.maze = new Maze({
 					cells : cells
 				});
+				interaction = new UserInteraction({
+					cell : cells[0][0]
+				});
 				this.draw();
 			}.bind(this));
 		},
@@ -52,26 +57,40 @@
 			this.fetchMazeAndDraw();
 		},
 		handleClickDrawSolution : function(){
+
+			var initialNode = this.maze.cells[0][0];
 			var codeSolution = this.editor.getSession().getValue();
 
-			codeSolution = eval(codeSolution);	
+			interaction.init({
+				cells : this.maze.cells,
+				cell : {
+					x : initialNode.x,
+					y : initialNode.y,
+					width : initialNode.width,
+					height : initialNode.height,
+					walls : {
+						rigth : initialNode.walls.rigth,
+						left : initialNode.walls.left,
+						top : initialNode.walls.top,
+						bottom : initialNode.walls.bottom
+					}
+				}
+			});
 
-			var result = codeSolution.bind(this.maze)(0,0,this.maze.width - 1 , this.maze.height -1);
+			interaction.run = eval(codeSolution);	
+
+			interaction.run();
+
+			var solution = interaction.moves;
 
 			if(this.maze.animationInterval && this.maze.mainInterval){
 				this.maze.stopAnimation();
 				this.maze.clearCell(this.context,this.maze.lastNode);
 			}
 
-			if(result && result.length){
-				this.maze.drawSolution(this.context,result);
+			if(solution && solution.length){
+				this.maze.drawSolution(this.context,solution);
 			}
-
-			/*this.fetchMazeSolution({
-				cells : this.maze.cells
-			}).then(function(response){
-				this.maze.drawSolution(this.context,response);
-			}.bind(this));*/
 		},
 		draw : function(){
 			this.context.clearRect(0,0,this.canvas.width,this.canvas.height);

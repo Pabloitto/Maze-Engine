@@ -38,10 +38,8 @@ module.exports = (function(){
 			});
 		},
 		drawSolution : function(context,sol){
-			this.solution = sol;
 
-			this.solution.shift();
-			this.solution.pop();
+			this.solution = sol;
 
 			this.lastNode = this.cells[0][0];
 
@@ -53,13 +51,15 @@ module.exports = (function(){
 
 		},
 		animatePath:function(context){
-
-			this.clearCell(context,this.lastNode);
         	
 			if(this.solution.length === 0){
+				this.clearCell(context,this.lastNode);
+				this.fillCell(context,this.cells[0][0], "blue");
         		this.stopAnimation();
         		return;
         	}
+
+        	this.clearCell(context,this.lastNode);
 
         	
         	var cell = this.solution.shift();
