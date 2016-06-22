@@ -1,60 +1,81 @@
 module.exports = (function(){
 
+	var cells = [],
+		end = null, 
+		cell = null, 
+		moves = [],
+		toBePaint = [],
+		movePromises = [],
+		context,
+		fps = 1000 / 5;
+
 	function UserInteraction(props){
 		this.init(props);
 	}
 
 	UserInteraction.prototype = {
-		cells : [],
-		cell : null,
 		x : 0,
 		y : 0,
-		moves : [],
+		getMoves : function(){
+			return moves;
+		},
+		getToPaint : function(){
+			return toBePaint;
+		},
 		init : function(props){
-			this.cell = props.cell;
-			this.cells = props.cells;
-			this.moves = [];
+			cell = props.cell;
+			end = props.end;
+			cells = props.cells;
+			moves = [];
+			toBePaint = [];
+			movePromises.forEach(function(promise){
+				clearTimeout(promise);
+			});
 			this.x = 0;
 			this.y = 0;
 		},
 		isComplete : function(){
-			console.log("Is Complete " + this.cell.x + " " + this.cell.y);
-			return this.cell.x === this.cells.length - 1 && this.cell.y === this.cells[0].length - 1;
+			return cell.x === end.x && cell.y === end.y;
 		},
 		moveTo : function(direction){
-			if(!this.canMoveTo(direction)){
-				return null;
-			}
 			var nextMove = this.getNextMove(direction);
-			this.moves.push(nextMove);
+			moves.push(nextMove);
+			movePromises.push(setTimeout(function(){
+				toBePaint.push(nextMove);
+			}.bind(this), moves.length * fps));
 			return nextMove;
 		},
 		canMoveTo : function(direction){
-			var lastMove = this.moves[this.moves.length - 1] || this.getSingleMove();
+			var lastMove = moves[moves.length - 1] || this.getSingleMove();
 			return lastMove.walls[direction] === null;
 		},
 		getNextMove : function(direction){
 
 			switch(direction){
 				case 'left' : 
-				this.cell.x-=1;
+				cell.x-=1;
 				break;
-				case 'rigth' : 
-				this.cell.x += 1;
+				case 'right' : 
+				cell.x += 1;
 				break;
 				case 'bottom' : 
-				this.cell.y += 1;
+				cell.y += 1;
 				break;
 				case 'top' : 
-				this.cell.y -= 1;
+				cell.y -= 1;
 				break;
 			}
 
-			return this.getSingleMove();
+			var result = this.getSingleMove();
+
+			this.x = result.x;
+			this.y = result.y;
+
+			return result;
 			
 		},
 		getSingleMove : function(){
-			var initialNode = this.cells[this.cell.x][this.cell.y];
+			var initialNode = cells[cell.x][cell.y];
 
 			return {
 				x : initialNode.x,
@@ -62,15 +83,18 @@ module.exports = (function(){
 				width : initialNode.width,
 				height : initialNode.height,
 				walls : {
-					rigth : initialNode.walls.rigth,
+					right : initialNode.walls.right,
 					left : initialNode.walls.left,
 					top : initialNode.walls.top,
 					bottom : initialNode.walls.bottom
 				}
 			};
 		},
-		run : function(){
-			//this method could be overrided by user
+		execute : function(runFunction){
+			if(runFunction && typeof runFunction === "function"){
+				runFunction();
+				console.log(moves.length);
+			}
 		},
 	};
 

@@ -6,7 +6,7 @@ module.exports = (function(){
 	function Cell(rawCell){
 		this.walls = {
 			left : null,
-			rigth : null,
+			right : null,
 			top : null,
 			bottom : null
 		};
@@ -14,7 +14,7 @@ module.exports = (function(){
 	}
 
 	Cell.prototype = {
-		names : ["left","rigth","top","bottom"],
+		names : ["left","right","top","bottom"],
 		x : 0,
 		y : 0,
 		width : Config.CELL_SIZE,
@@ -22,7 +22,7 @@ module.exports = (function(){
 		visited : false,
 		walls : {
 			left : null,
-			rigth : null,
+			right : null,
 			top : null,
 			bottom : null
 		},

@@ -26,7 +26,7 @@ module.exports = (function(){
 			context.lineTo(this.x * this.width,(this.y + 1) * this.height);
 			context.stroke();
 		},
-		rigth:function(context){
+		right:function(context){
 			context.strokeStyle = this.color;
 			context.beginPath();
 			context.moveTo((this.x * this.width) + this.width,this.y * this.height);
