@@ -1,23 +1,43 @@
 module.exports = (function(){
 
 	var Cell = require("./cell");
+	var ImageFactory = require("./images");
+	var end = null;
+	var defaultDirection = {
+			direction : 'bottom',
+			index : 0,
+			positions : [
+				{x : 0 ,y : 0},
+		    	{x : 1 ,y : 0},
+		    	{x : 2 ,y : 0}
+		    ]
+	};
 
 	function Maze(props){
+		ImageFactory = new ImageFactory();
 		this.init(props);
 	}
 
 	Maze.prototype = {
+		currentDirection : defaultDirection,
 		width : 0,
 		height : 0,
 		cells : [],
-		solution : [],
-		animationInterval : null,
-		mainInterval : null,
-		lastNode : null,
+		getEndNode : function(){
+			return end;
+		},
 		init : function(props){
-			this.width = props.cells.length;
-			this.height = props.cells[0].length;
+			ImageFactory.loadImage('hero');
+			this.width = props.width;
+			this.height = props.height;
 			this.createCells(props.cells);
+			end = this.getRandomPosition();
+			setInterval(function(){
+				this.currentDirection.index += 1;
+				if(this.currentDirection.index === 3){
+					this.currentDirection.index = 0;
+				}
+			}.bind(this), 1000 / 5);
 		},
 		createCells : function(rawCells){
 			for (var i = 0; i < rawCells.length; i++) {
@@ -28,82 +48,30 @@ module.exports = (function(){
 		    }
 		},
 		draw : function(context){
-			this.fillCell(context,this.cells[0][0], "blue");
-			this.fillCell(context,this.cells[this.width - 1][this.height - 1], "red");
-
+			this.fillCell(context,this.cells[end.x][end.y], "red");
 			this.cells.forEach(function (rows) {
 				rows.forEach(function(cell){
 					cell.draw(context);
 				});
 			});
 		},
-		drawSolution : function(context,sol){
-			this.solution = sol;
+		isInvalidMove : function(currentNode,nextNode){
 
-			this.solution.shift();
-			this.solution.pop();
-
-			this.lastNode = this.cells[0][0];
-
-            this.animationInterval = requestAnimationFrame(this.animatePath.bind(this,context));
-
-            this.mainInterval = setInterval(function(){
-            	this.animatePath(context);
-            }.bind(this),250);
-
-		},
-		animatePath:function(context){
-
-			this.clearCell(context,this.lastNode);
-        	
-			if(this.solution.length === 0){
-        		this.stopAnimation();
-        		return;
+        	if(nextNode.x > currentNode.x && currentNode.walls.right){
+        		return true;
         	}
 
-        	
-        	var cell = this.solution.shift();
-        	
-        	if(Math.abs(cell.x - this.lastNode.x) > 1 ||
-        		Math.abs(cell.y - this.lastNode.y) > 1){
-        		this.fillCell(context,this.cells[0][0], "blue");
-        		this.stopAnimation();
-        		return;
+        	if(nextNode.y < currentNode.y && currentNode.walls.top){
+        		return true;
         	}
 
-        	if(cell.x > this.lastNode.x && this.lastNode.walls.rigth){
-        		this.fillCell(context,this.cells[0][0], "blue");
-        		this.stopAnimation();
-        		return;
+        	if(nextNode.y > currentNode.y && currentNode.walls.bottom){
+        		return true;
         	}
 
-        	if(cell.y < this.lastNode.y && this.lastNode.walls.top){
-        		this.fillCell(context,this.cells[0][0], "blue");
-        		this.stopAnimation()
-        		return;
+        	if(nextNode.x < currentNode.x && currentNode.walls.left){
+        		return true;
         	}
-
-        	if(cell.y > this.lastNode.y && this.lastNode.walls.bottom){
-        		this.fillCell(context,this.cells[0][0], "blue");
-        		this.stopAnimation();
-        		return;
-        	}
-
-        	if(cell.x < this.lastNode.x && this.lastNode.walls.left){
-        		this.fillCell(context,this.cells[0][0], "blue");
-        		this.stopAnimation()
-        		return;
-        	}
-
-        	this.fillCell(context,cell, "blue");
-        	
-        	this.lastNode = cell;
-		},
-		stopAnimation : function(){
-			cancelAnimationFrame(this.animationInterval);
-        	clearInterval(this.mainInterval);
-        	this.animationInterval = null;
-        	this.mainInterval = null;
 		},
 		fillCell : function(context,cell,color){
 			context.fillStyle = color;
@@ -111,10 +79,78 @@ module.exports = (function(){
 			var y = (cell.y * cell.height) + 5;
 			context.fillRect(x,y,cell.width / 2,cell.height / 2);
 		},
+		drawSprite : function(context,sprite,nextMove){
+			var cell = nextMove.move;
+			var x = cell.x * cell.width;
+			var y = cell.y * cell.height;
+			var image = ImageFactory.getImage(sprite.image);
+			var positions = null;
+			var pos = this.currentDirection.positions[0];
+
+			if(nextMove.direction){
+				positions = this.getSpritePosition(nextMove.direction);
+				if(nextMove.direction !== this.currentDirection.direction){
+					this.currentDirection.index = 0;
+					this.currentDirection.direction = nextMove.direction;
+					this.currentDirection.positions = positions;
+				}
+				pos = this.currentDirection.positions[this.currentDirection.index];
+			}
+
+			context.drawImage(image, 
+				pos.x * cell.width, 
+				pos.y * cell.height, 
+				cell.width, 
+				cell.height, 
+				x, 
+				y, 
+				cell.width, 
+				cell.height);
+		},
+		getSpritePosition : function(direction){
+			var positions = [];
+			switch(direction){
+                case 'bottom': 
+                positions = [
+                	{x : 0 ,y : 0},
+                	{x : 1 ,y : 0},
+                	{x : 2 ,y : 0}
+                ];  
+                break;
+                case 'right':  
+	                positions = [
+	                	{x : 3 ,y : 0},
+	                	{x : 4 ,y : 0},
+	                	{x : 5 ,y : 0}
+	                ];
+                break;
+                case 'left': 
+                	positions = [
+	                	{x : 6 ,y : 0},
+	                	{x : 7 ,y : 0},
+	                	{x : 8 ,y : 0}
+	                ];
+                break;
+                case 'top': 
+                	positions = [
+	                	{x : 9 ,y : 0},
+	                	{x : 10 ,y : 0},
+	                	{x : 11 ,y : 0}
+	                ];
+                break;
+            }
+            return positions;
+		},
 		clearCell : function(context,cell){
 			var x = (cell.x * cell.width) + 5;
 			var y = (cell.y * cell.height) + 5;
 			context.clearRect(x,y,cell.width / 2,cell.height / 2);
+		},
+		getRandomPosition:function(){
+			return {
+				x : Math.floor(Math.random() * this.width),
+        		y : Math.floor(Math.random() * this.height)
+			}
 		}
 	};
 

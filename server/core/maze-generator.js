@@ -17,7 +17,7 @@ module.exports = (function(){
 	}
 
 	MazeGenerator.prototype = {
-		names : ["left","rigth","top","bottom"],
+		names : ["left","right","top","bottom"],
 		width : 0,
 		height : 0,
 		cells : [],
@@ -51,14 +51,14 @@ module.exports = (function(){
 	                cell.walls.top = null;
 	                this.moveTo(nextCell, "bottom");
 	            } else if (cell.x < nextCell.x) {
-	                cell.walls.rigth = null;
+	                cell.walls.right = null;
 	                this.moveTo(nextCell, "left");
 	            } else if (cell.y < nextCell.y) {
 	                cell.walls.bottom = null;
 	                this.moveTo(nextCell, "top");
 	            } else if (cell. x > nextCell.x) {
 	                cell.walls.left = null;
-	                this.moveTo(nextCell, "rigth");
+	                this.moveTo(nextCell, "right");
 	            }
 
 	            moves = this.getNewMove(cell);
@@ -80,7 +80,7 @@ module.exports = (function(){
 
             if (checkWalls) {
                 if ((y < cell.y && cell.walls.top) ||
-                    (x > cell.x && cell.walls.rigth) ||
+                    (x > cell.x && cell.walls.right) ||
                     (y > cell.y && cell.walls.bottom) ||
                     (x < cell.x && cell.walls.left)) {
                     return;
