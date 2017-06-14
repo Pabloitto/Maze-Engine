@@ -1,4 +1,4 @@
-(function() {
+(function () {
 
     "use strict";
 
@@ -8,42 +8,47 @@
         router = express(),
         bodyParser = require('body-parser'),
         server = http.createServer(router),
-        MazeGenerator = require("./server/core/maze-generator");
+        MazeGenerator = require("./server/core/maze-generator"),
+        cors = require('cors');
 
-    function init(){
-		router.use(bodyParser.json({limit: '50mb'}));
-		router.use(bodyParser.urlencoded({ limit: '50mb',extended: true }));
-	    router.use(express.static(path.resolve(__dirname, 'client')));
+    function init() {
+        router.use(cors({
+            "origin": "*",
+            "methods": "GET",
+        }));
+        router.use(bodyParser.json({ limit: '50mb' }));
+        router.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
+        router.use(express.static(path.resolve(__dirname, 'client')));
 
-        router.get('/api/v1/maze', function(request, response){  
+        router.get('/api/v1/maze', function (request, response) {
             var width = request.query.width;
             var height = request.query.height;
             var mazeGenerator = new MazeGenerator({
-                width : width,
-                height : height
+                width: width,
+                height: height
             });
             response.json(mazeGenerator.cells);
         });
 
-        router.post('/api/v1/maze/solution',function(request,response){
+        router.post('/api/v1/maze/solution', function (request, response) {
             var body = request.body;
             var cells = body.cells;
             var mazeGenerator = new MazeGenerator({
-                cells : cells
+                cells: cells
             });
-            var solution = mazeGenerator.getSolutionPath(0,0,mazeGenerator.width - 1, mazeGenerator.height - 1);
+            var solution = mazeGenerator.getSolutionPath(0, 0, mazeGenerator.width - 1, mazeGenerator.height - 1);
             response.json(solution);
         });
 
-	    startServer();
+        startServer();
     }
 
-   function startServer(){
+    function startServer() {
         router.set('port', (process.env.PORT || 8081));
-        router.listen(router.get('port'), function() {
-          console.log('Node app is running on port', router.get('port'));
+        router.listen(router.get('port'), function () {
+            console.log('Node app is running on port', router.get('port'));
         });
-   	}
+    }
 
     init();
 
